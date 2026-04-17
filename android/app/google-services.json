@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "490669034000",
+    "project_id": "academic-x-f325b",
+    "storage_bucket": "academic-x-f325b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:490669034000:android:9e9d5b5bbad1d424d89895",
+        "android_client_info": {
+          "package_name": "com.academicx.academic_x"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "490669034000-8odnmnt01i08ire1j9unm7og7mk3cnfd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.academicx.academic_x",
+            "certificate_hash": "1cb3f0d25e6b8848ecc07bf1b9a31884e1d4f99f"
+          }
+        },
+        {
+          "client_id": "490669034000-t8iap5gafvucj5v2ncfloo2pdbnfplo9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjezGGSFj8X7N51tqAj_3tojOKQmsfz2A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "490669034000-t8iap5gafvucj5v2ncfloo2pdbnfplo9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
