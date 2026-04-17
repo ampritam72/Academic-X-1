@@ -1,0 +1,131 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============== HELPER FUNCTIONS ==============
+
+    // Check if user is authenticated
+    function isAuth() {
+      return request.auth.uid != null;
+    }
+
+    // Check if user owns the document
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+
+    // Get user role from Firestore
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    // Get user section from Firestore
+    function getUserSection() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.section;
+    }
+
+    // Check if user is CR (Class Representative)
+    function isCR() {
+      return getUserRole() == 'cr';
+    }
+
+    // Check if user is admin
+    function isAdmin() {
+      return getUserRole() == 'admin';
+    }
+
+    // ============== USER PROFILES ==============
+    // Path: /users/{uid}
+    // Only the user can read/write their own profile
+    // Admins can read all profiles
+
+    match /users/{uid} {
+      allow read: if isAuth() && (isOwner(uid) || isAdmin());
+      allow create: if isAuth() && isOwner(uid);
+      allow update: if isAuth() && isOwner(uid);
+      allow delete: if isAuth() && isOwner(uid);
+    }
+
+    // ============== STUDENT ID MAPPING ==============
+    // Path: /student_id_map/{studentId}
+    // All authenticated users can read
+    // Only admins can write
+
+    match /student_id_map/{studentId} {
+      allow read: if isAuth();
+      allow write: if isAuth() && isAdmin();
+    }
+
+    // ============== NOTICES ==============
+    // Path: /notices/{noticeId}
+    // All authenticated users in same section can read
+    // CRs and admins can create/update/delete
+
+    match /notices/{noticeId} {
+      allow read: if isAuth() && getUserSection() == resource.data.section;
+
+      allow create: if isAuth() && (isCR() || isAdmin());
+
+      allow update: if isAuth() && (
+        isOwner(resource.data.createdBy) ||
+        isAdmin()
+      );
+
+      allow delete: if isAuth() && (
+        isOwner(resource.data.createdBy) ||
+        isAdmin()
+      );
+    }
+
+    // ============== ROUTINES ==============
+    // Path: /routines/{routineId}
+    // All authenticated users can read
+    // Only admins can write
+
+    match /routines/{routineId} {
+      allow read: if isAuth();
+      allow write: if isAuth() && isAdmin();
+    }
+
+    // ============== CHATS ==============
+    // Path: /chats/{chatId}
+    // Users in same section can read/write
+
+    match /chats/{chatId} {
+      allow read: if isAuth() && getUserSection() == resource.data.section;
+
+      allow create: if isAuth() &&
+                      getUserSection() == request.resource.data.section;
+
+      allow update: if isAuth() &&
+                      getUserSection() == resource.data.section;
+    }
+
+    // ============== SLIDES ==============
+    // Path: /slides/{slideId}
+    // All section members can read
+    // CRs and admins can create/update/delete
+
+    match /slides/{slideId} {
+      allow read: if isAuth() && getUserSection() == resource.data.section;
+
+      allow create: if isAuth() && (isCR() || isAdmin());
+
+      allow update: if isAuth() && (
+        isOwner(resource.data.uploadedBy) ||
+        isAdmin()
+      );
+
+      allow delete: if isAuth() && (
+        isOwner(resource.data.uploadedBy) ||
+        isAdmin()
+      );
+    }
+
+    // ============== DEFAULT DENY ==============
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
